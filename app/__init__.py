@@ -1,6 +1,6 @@
 from flask import Flask
 from config import Config
-from app.extensions import db, migrate, jwt, cors
+from app.extensions import db, migrate, jwt, cors, swagger
 
 
 def create_app(config_class=Config):
@@ -11,6 +11,7 @@ def create_app(config_class=Config):
     migrate.init_app(app, db)
     jwt.init_app(app)
     cors.init_app(app)  # allows your React frontend to call this API
+    swagger.init_app(app)  # enables Swagger UI at /apidocs
 
     from app.models import Drug, User, Report  # noqa: F401 - registers models with SQLAlchemy
 

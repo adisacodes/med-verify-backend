@@ -8,9 +8,21 @@ drugs_bp = Blueprint("drugs", __name__)
 @drugs_bp.route("/search", methods=["GET"])
 def search_drugs():
     """
-    Public search - no login required.
-    Query params: ?q=<search term>
-    Searches trade_name, active_ingredient, and registration_number.
+    Search registered drugs
+    ---
+    tags:
+      - Drugs
+    parameters:
+      - name: q
+        in: query
+        type: string
+        required: true
+        description: Search term (matches trade name, active ingredient, or registration number)
+    responses:
+      200:
+        description: List of matching drugs
+      400:
+        description: Missing search term
     """
     query = request.args.get("q", "").strip()
 
@@ -35,8 +47,21 @@ def search_drugs():
 @drugs_bp.route("/verify/<registration_number>", methods=["GET"])
 def verify_by_registration(registration_number):
     """
-    Exact-match verification by registration number.
-    This is the 'is this real?' endpoint.
+    Verify a drug by registration number
+    ---
+    tags:
+      - Drugs
+    parameters:
+      - name: registration_number
+        in: path
+        type: string
+        required: true
+        description: The exact PPB registration number to check
+    responses:
+      200:
+        description: Match found - drug is registered
+      404:
+        description: No matching registration found
     """
     drug = Drug.query.filter_by(registration_number=registration_number).first()
 
@@ -54,5 +79,22 @@ def verify_by_registration(registration_number):
 
 @drugs_bp.route("/<int:drug_id>", methods=["GET"])
 def get_drug(drug_id):
+    """
+    Get a single drug by internal ID
+    ---
+    tags:
+      - Drugs
+    parameters:
+      - name: drug_id
+        in: path
+        type: integer
+        required: true
+        description: The internal database ID of the drug
+    responses:
+      200:
+        description: Drug details
+      404:
+        description: Drug not found
+    """
     drug = Drug.query.get_or_404(drug_id)
     return jsonify(drug.to_dict())
