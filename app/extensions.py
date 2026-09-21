@@ -8,4 +8,16 @@ db = SQLAlchemy()
 migrate = Migrate()
 jwt = JWTManager()
 cors = CORS()
-swagger = Swagger()
+
+swagger_template = {
+    "securityDefinitions": {
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
+            "description": "Paste your JWT like this: Bearer <your_token>",
+        }
+    }
+}
+
+swagger = Swagger(template=swagger_template)
