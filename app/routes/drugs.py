@@ -44,8 +44,8 @@ def search_drugs():
     })
 
 
-@drugs_bp.route("/verify/<registration_number>", methods=["GET"])
-def verify_by_registration(registration_number):
+@drugs_bp.route("/verify", methods=["GET"])
+def verify_by_registration():
     """
     Verify a drug by registration number
     ---
@@ -53,16 +53,23 @@ def verify_by_registration(registration_number):
       - Drugs
     parameters:
       - name: registration_number
-        in: path
+        in: query
         type: string
         required: true
-        description: The exact PPB registration number to check
+        description: The exact PPB registration number to check (e.g. H2015/00123/001)
     responses:
       200:
         description: Match found - drug is registered
+      400:
+        description: Missing registration number
       404:
         description: No matching registration found
     """
+    registration_number = request.args.get("registration_number", "").strip()
+
+    if not registration_number:
+        return jsonify({"error": "Please provide a registration_number query parameter"}), 400
+
     drug = Drug.query.filter_by(registration_number=registration_number).first()
 
     if drug:
