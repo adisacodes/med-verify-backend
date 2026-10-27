@@ -58,7 +58,7 @@ def register():
     db.session.add(user)
     db.session.commit()
 
-    access_token = create_access_token(identity=user.id)
+    access_token = create_access_token(identity=str(user.id))
 
     return jsonify({
         "user": user.to_dict(),
@@ -104,7 +104,7 @@ def login():
     if not user or not user.check_password(password):
         return jsonify({"error": "Invalid email or password"}), 401
 
-    access_token = create_access_token(identity=user.id)
+    access_token = create_access_token(identity=str(user.id))
 
     return jsonify({
         "user": user.to_dict(),

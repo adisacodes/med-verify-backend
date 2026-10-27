@@ -46,7 +46,7 @@ def create_report():
       401:
         description: Missing or invalid JWT
     """
-    user_id = get_jwt_identity()
+    user_id =int (get_jwt_identity())
     data = request.get_json()
 
     report = Report(
