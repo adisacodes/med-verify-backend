@@ -39,15 +39,39 @@ def create_report():
               example: https://example.com/photo.jpg
             location:
               type: string
+              description: Optional text label for the place
               example: Nairobi CBD, River Road
+            latitude:
+              type: number
+              description: Latitude of the pin (-90 to 90). Send together with longitude.
+              example: -1.2864
+            longitude:
+              type: number
+              description: Longitude of the pin (-180 to 180). Send together with latitude.
+              example: 36.8172
     responses:
       201:
         description: Report submitted successfully
+      400:
+        description: Invalid coordinates
       401:
         description: Missing or invalid JWT
     """
-    user_id =int (get_jwt_identity())
+    user_id = int(get_jwt_identity())
     data = request.get_json()
+
+    latitude = data.get("latitude")
+    longitude = data.get("longitude")
+
+    if latitude is not None or longitude is not None:
+        try:
+            latitude = float(latitude)
+            longitude = float(longitude)
+        except (TypeError, ValueError):
+            return jsonify({"error": "latitude and longitude must both be valid numbers"}), 400
+
+        if not (-90 <= latitude <= 90 and -180 <= longitude <= 180):
+            return jsonify({"error": "latitude or longitude is out of range"}), 400
 
     report = Report(
         reporter_id=user_id,
@@ -56,6 +80,8 @@ def create_report():
         description=data.get("description"),
         photo_url=data.get("photo_url"),
         location=data.get("location"),
+        latitude=latitude,
+        longitude=longitude,
     )
     db.session.add(report)
     db.session.commit()

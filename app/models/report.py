@@ -11,7 +11,9 @@ class Report(db.Model):
     product_name_text = db.Column(db.String(255))  # free-text fallback if drug_id is unknown
     description = db.Column(db.Text)
     photo_url = db.Column(db.String(500))
-    location = db.Column(db.String(255))
+    location = db.Column(db.String(255))  # optional text label, e.g. "next to Naivas"
+    latitude = db.Column(db.Float, nullable=True)
+    longitude = db.Column(db.Float, nullable=True)
     status = db.Column(db.String(20), default="pending")  # pending / reviewed / confirmed / dismissed
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
@@ -26,6 +28,8 @@ class Report(db.Model):
             "description": self.description,
             "photo_url": self.photo_url,
             "location": self.location,
+            "latitude": self.latitude,
+            "longitude": self.longitude,
             "status": self.status,
             "created_at": self.created_at.isoformat() if self.created_at else None,
         }
